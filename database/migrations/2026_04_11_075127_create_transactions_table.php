@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->decimal('paid_amount', 12, 2);
             $table->decimal('change_amount', 12, 2);
             $table->enum('payment_method', ['cash', 'transfer', 'qris']);
-            $table->enum('status', ['paid', 'pending', 'cancelled'])->default('paid');
+            $table->enum('status', ['paid', 'pending', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }
