@@ -5,10 +5,15 @@ namespace App\Http\Controllers\Product;
 use App\DTOs\Product\CreateProductDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Resources\Product\CreateProductResource;
 use App\Services\Product\ProductService;
+use App\Traits\ApiLogger;
+use App\Traits\ApiResponser;
 
 class ProductController extends Controller
 {
+    use ApiLogger, ApiResponser;
+
     private $productService;
 
     public function __construct(ProductService $productService)
@@ -22,9 +27,15 @@ class ProductController extends Controller
             $data = $this->productService
                 ->createProduct(CreateProductDTO::fromRequest($request));
 
-            return $data;
+            return $this->success(
+                'Store product data successfully',
+                new CreateProductResource($data),
+                200
+            );
         } catch (\Throwable $th) {
-            throw $th;
+            $this->logError('Failed to create: ', $th);
+
+            return $this->error('Failed to store product data', 400, $th->getMessage());
         }
     }
 }

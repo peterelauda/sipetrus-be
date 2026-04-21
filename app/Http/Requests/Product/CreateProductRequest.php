@@ -26,8 +26,10 @@ class CreateProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'cost_price' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0'
+            'stock' => 'required|integer|min:0',
+            'barcode' => 'nullable|string|max:35'
         ];
     }
 
@@ -39,12 +41,16 @@ class CreateProductRequest extends FormRequest
         return [
             'name.required' => 'The product name is mandatory.',
             'name.string' => 'The name must be a valid text.',
+            'cost_price.required' => 'Please provide a cost price for the item.',
+            'cost_price.numeric' => 'The cost price must be a valid number.',
+            'cost_price.min' => 'The cost price cannot be less than 0.',
             'price.required' => 'Please provide a price for the item.',
             'price.numeric' => 'The price must be a valid number.',
             'price.min' => 'The price cannot be less than 0.',
             'stock.required' => 'Stock quantity is required.',
             'stock.integer' => 'Stock must be a whole number.',
             'stock.min' => 'Stock cannot be a negative value.',
+            'barcode.string' => 'The barcode must be a valid text.',
         ];
     }
 

@@ -5,6 +5,7 @@ namespace App\Services\Product;
 use App\DTOs\Product\CreateProductDTO;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
@@ -27,14 +28,23 @@ class ProductService
     {
         $userId = auth()->id();
 
+        $isProductExist = $this->productRepository
+            ->getProductByNameAndCode($userId, $dto->name, $dto->barcode);
+
+        if ($isProductExist) {
+            throw new Exception('Product already registered');
+        }
+
         DB::beginTransaction();
 
         try {
             $product = $this->productRepository->create([
                 'user_id' => $userId,
                 'product_code' => $this->generateProductCode($userId),
+                'barcode' => $dto->barcode,
                 'name' => $dto->name,
                 'price' => $dto->price,
+                'cost_price' => $dto->costPrice,
                 'stock' => $dto->stock,
             ]);
 

@@ -17,9 +17,21 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
 
     public function getLatestProduct(string $userId)
     {
-        $this->model->where('user_id', $userId)
+        return $this->model->where('user_id', $userId)
             ->orderBy('id', 'desc')
             ->lockForUpdate()
+            ->first();
+    }
+
+    public function getProductByNameAndCode(
+        string $userId,
+        string $productName,
+        string $barcode
+    ) {
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('name', 'LIKE', '%' . $productName . '%')
+            ->where('barcode', $barcode)
             ->first();
     }
 }
