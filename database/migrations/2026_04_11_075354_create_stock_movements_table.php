@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->enum('type', ['in', 'out']);
             $table->integer('qty');
