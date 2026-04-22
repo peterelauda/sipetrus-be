@@ -59,4 +59,21 @@ class ProductController extends Controller
             return $this->error('Get products data failed', 400, $th->getMessage());
         }
     }
+
+    public function getProductById($id)
+    {
+        try {
+            $data = $this->productService->getProductById($id);
+
+            return $this->success(
+                'Get product data successfully',
+                new GetProductsResource($data),
+                200
+            );
+        } catch (\Throwable $th) {
+            $this->logError('Get product data failed: ', $th);
+
+            return $this->error('Get product data failed', 400, $th->getMessage());
+        }
+    }
 }
