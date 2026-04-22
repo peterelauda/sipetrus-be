@@ -3,6 +3,7 @@
 namespace App\Services\Product;
 
 use App\DTOs\Product\CreateProductDTO;
+use App\DTOs\Product\GetProductsDTO;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use Exception;
@@ -66,6 +67,15 @@ class ProductService
 
             throw $th;
         }
+    }
+
+    public function getProducts(GetProductsDTO $dto)
+    {
+        $userId = auth()->id();
+
+        $products = $this->productRepository->getProducts($userId, $dto);
+
+        return $products;
     }
 
     public function generateProductCode(int $userId)

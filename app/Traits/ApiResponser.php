@@ -8,6 +8,15 @@ trait ApiResponser
 {
     protected function success(string $message = '', $data = null, int $code = 200)
     {
+        if ($data instanceof \Illuminate\Http\Resources\Json\AnonymousResourceCollection) {
+            $resourceData = $data->response()->getData(true);
+
+            return response()->json(array_merge([
+                'status' => 'Success',
+                'message' => $message,
+            ], $resourceData), $code);
+        }
+
         if (is_array($data) && isset($data['data'], $data['meta'])) {
             return response()->json(array_merge([
                 'status' => 'Success',
