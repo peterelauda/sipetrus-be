@@ -17,4 +17,5 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [ProductController::class, 'createProduct']);
+    Route::get('/', [ProductController::class, 'getProducts']);
 });
