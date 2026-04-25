@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquents\Product;
 
 use App\DTOs\Product\GetProductsDTO;
+use App\DTOs\Product\SearchProductDTO;
 use App\Models\Product;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Eloquents\BaseRepository;
@@ -50,5 +51,12 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
                 $q->where('barcode', $barcode);
             })
             ->paginate($dto->perPage ?? 10);
+    }
+
+    public function searchProduct(SearchProductDTO $dto)
+    {
+        return Product::search($dto->keyword)
+            ->where('user_id', auth()->id())
+            ->paginate(10);
     }
 }
