@@ -39,6 +39,10 @@ trait ApiResponser
             default => 'Sorry an error occurred',
         };
 
+        if (!config('app.debug')) {
+            $errors = 'Sorry an error occurred, please contact our support';
+        }
+
         return response()->json([
             'message' => $message,
             'errors' => $errors,

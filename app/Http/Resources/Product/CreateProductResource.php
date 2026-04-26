@@ -16,12 +16,12 @@ class CreateProductResource extends JsonResource
     {
         return [
             'user_id' => $this->user_id,
-            'product_code' => $this->product_code,
             'barcode' => $this->barcode,
             'name' => $this->name,
             'price' => (float) $this->price,
             'cost_price' => (float) $this->cost_price,
             'stock' => (int) $this->stock,
+            'category' => (string) $this->category,
             'updated_at' => $this->updated_at,
             'created_at' => $this->created_at,
             'id' => $this->id,

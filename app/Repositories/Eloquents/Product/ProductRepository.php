@@ -19,7 +19,9 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
 
     public function getLatestProduct(string $userId)
     {
-        return $this->model->where('user_id', $userId)
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('barcode', 'LIKE', '%P%')
             ->orderBy('id', 'desc')
             ->lockForUpdate()
             ->first();
@@ -28,12 +30,14 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function getProductByNameAndCode(
         string $userId,
         string $productName,
-        string $barcode
+        ?string $barcode
     ) {
         return $this->model
             ->where('user_id', $userId)
             ->where('name', 'LIKE', '%' . $productName . '%')
-            ->where('barcode', $barcode)
+            ->when($barcode, function ($q) use ($barcode) {
+                $q->where('barcode', $barcode);
+            })
             ->first();
     }
 
@@ -43,9 +47,6 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->where('user_id', $userId)
             ->when($dto->name, function ($q, $name) {
                 $q->where('name', 'like', '%' . $name . '%');
-            })
-            ->when($dto->productCode, function ($q, $productCode) {
-                $q->where('product_code', $productCode);
             })
             ->when($dto->barcode, function ($q, $barcode) {
                 $q->where('barcode', $barcode);

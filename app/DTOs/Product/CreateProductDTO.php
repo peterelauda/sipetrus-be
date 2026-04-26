@@ -13,6 +13,7 @@ class CreateProductDTO
         public readonly float $costPrice,
         public readonly int $stock,
         public readonly ?string $barcode,
+        public readonly string $category,
     ) {
     }
 
@@ -23,7 +24,8 @@ class CreateProductDTO
             price: (float) $request->validated('price'),
             costPrice: (float) $request->validated('cost_price'),
             stock: (int) $request->validated('stock'),
-            barcode: (string) $request->validated('barcode'),
+            barcode: $request->validated('barcode'),
+            category: (string) $request->validated('category'),
         );
     }
 }

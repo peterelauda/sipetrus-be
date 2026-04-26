@@ -42,12 +42,12 @@ class ProductService
         try {
             $product = $this->productRepository->create([
                 'user_id' => $userId,
-                'product_code' => $this->generateProductCode($userId),
-                'barcode' => $dto->barcode,
+                'barcode' => $dto->barcode ?? $this->generateProductCode($userId),
                 'name' => $dto->name,
                 'price' => $dto->price,
                 'cost_price' => $dto->costPrice,
                 'stock' => $dto->stock,
+                'category' => $dto->category,
             ]);
 
             if ($dto->stock > 0) {
@@ -90,7 +90,7 @@ class ProductService
     {
         $last = $this->productRepository->getLatestProduct($userId);
 
-        $num = $last ? (int) substr($last->product_code, 1) : 0;
+        $num = $last ? (int) substr($last->barcode, 1) : 0;
 
         return 'P' . str_pad($num + 1, 5, '0', STR_PAD_LEFT);
     }

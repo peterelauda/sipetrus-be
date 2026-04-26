@@ -26,7 +26,6 @@ class GetProductsRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string|max:255',
-            'product_code' => 'nullable|string|max:10',
             'barcode' => 'nullable|string',
             'per_page' => 'nullable|integer|min:1|max:100',
         ];
@@ -40,8 +39,6 @@ class GetProductsRequest extends FormRequest
         return [
             'name.string' => 'The product name must be a valid text string.',
             'name.max' => 'The product name may not be longer than 255 characters.',
-            'product_code.string' => 'The product code must be a valid text string.',
-            'product_code.max' => 'The product code may not be longer than 10 characters.',
             'barcode.string' => 'The barcode must be a valid text string.',
             'per_page.integer' => 'The items per page must be a valid integer.',
             'per_page.min' => 'The items per page must be at least 1.',
