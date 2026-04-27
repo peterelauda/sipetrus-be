@@ -17,7 +17,6 @@ class GetProductsResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'product_code' => $this->product_code,
             'barcode' => $this->barcode,
             'cost_price' => (float) $this->cost_price,
             'price' => (float) $this->price,

@@ -9,7 +9,6 @@ class GetProductsDTO
      */
     public function __construct(
         public readonly ?string $name,
-        public readonly ?string $productCode,
         public readonly ?string $barcode,
         public readonly ?int $perPage,
     ) {
@@ -19,7 +18,6 @@ class GetProductsDTO
     {
         return new self(
             name: (string) $request->validated('name'),
-            productCode: (string) $request->validated('product_code'),
             barcode: (string) $request->validated('barcode'),
             perPage: (int) $request->validated('per_page'),
         );
