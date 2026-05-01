@@ -24,4 +24,9 @@ class Product extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    protected $casts = [
+        'price' => 'float',
+        'cost_price' => 'float',
+    ];
 }
