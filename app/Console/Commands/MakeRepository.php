@@ -106,10 +106,13 @@ PHP;
 
         $bindingLine = "        \$this->app->bind({$interfaceClass}::class, {$repositoryClass}::class);";
 
-        if (!str_contains($providerContent, $contractUse)) {
+        if (
+            !str_contains($providerContent, $contractUse) &&
+            !str_contains($providerContent, $eloquentUse)
+        ) {
             $providerContent = preg_replace(
-                '/namespace App\\\\Providers;/',
-                "namespace App\\Providers;\n\n{$contractUse}\n{$eloquentUse}",
+                '/namespace App\\\\Providers;\n*/',
+                "namespace App\\Providers;\n\n{$contractUse}\n{$eloquentUse}\n",
                 $providerContent
             );
         }

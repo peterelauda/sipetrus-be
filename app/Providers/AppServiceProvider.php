@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\Transaction\TransactionItemRepositoryInterface;
+use App\Repositories\Eloquents\Transaction\TransactionItemRepository;
+use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
+use App\Repositories\Eloquents\Transaction\TransactionRepository;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use App\Repositories\Eloquents\Product\StockMovementRepository;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
@@ -17,6 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(TransactionItemRepositoryInterface::class, TransactionItemRepository::class);
+        $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
         $this->app->bind(StockMovementRepositoryInterface::class, StockMovementRepository::class);
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);

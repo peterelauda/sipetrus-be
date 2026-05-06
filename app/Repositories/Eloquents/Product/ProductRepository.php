@@ -60,4 +60,13 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->where('user_id', auth()->id())
             ->paginate(10);
     }
+
+    public function getProductsByIds(array $id)
+    {
+        return $this->model
+            ->whereIn('id', $id)
+            ->lockForUpdate()
+            ->get()
+            ->keyBy('id');
+    }
 }
