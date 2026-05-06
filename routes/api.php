@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Transaction\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test', function () {
@@ -20,4 +21,8 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ProductController::class, 'getProducts']);
     Route::get('/{id}', [ProductController::class, 'getProductById']);
     Route::get('/search', [ProductController::class, 'searchProduct']);
+});
+
+Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [TransactionController::class, 'storeTransaction']);
 });

@@ -12,4 +12,5 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
     public function getProductByNameAndCode(string $userId, string $productName, ?string $barcode);
     public function getProducts(string $userId, GetProductsDTO $dto);
     public function searchProduct(SearchProductDTO $dto);
+    public function getProductsByIds(array $id);
 }
