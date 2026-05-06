@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class GetProductsRequest extends FormRequest
+class SearchProductRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,9 +25,7 @@ class GetProductsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'nullable|string|max:255',
-            'barcode' => 'nullable|string',
-            'per_page' => 'nullable|integer|min:1|max:100',
+            'keyword' => 'nullable|string',
         ];
     }
 
@@ -37,12 +35,7 @@ class GetProductsRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.string' => 'The product name must be a valid text string.',
-            'name.max' => 'The product name may not be longer than 255 characters.',
-            'barcode.string' => 'The barcode must be a valid text string.',
-            'per_page.integer' => 'The items per page must be a valid integer.',
-            'per_page.min' => 'The items per page must be at least 1.',
-            'per_page.max' => 'You cannot request more than 100 items per page.',
+            'keyword.string' => 'The keyword must be a valid string.',
         ];
     }
 

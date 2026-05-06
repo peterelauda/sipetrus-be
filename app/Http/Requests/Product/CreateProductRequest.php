@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests\Product;
 
+use App\Enums\ProductCategoryEnum;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\Rules\Enum;
 
 class CreateProductRequest extends FormRequest
 {
@@ -29,7 +31,8 @@ class CreateProductRequest extends FormRequest
             'cost_price' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|max:35'
+            'barcode' => 'nullable|string|max:35',
+            'category' => ['required', new Enum(ProductCategoryEnum::class)],
         ];
     }
 
@@ -51,6 +54,8 @@ class CreateProductRequest extends FormRequest
             'stock.integer' => 'Stock must be a whole number.',
             'stock.min' => 'Stock cannot be a negative value.',
             'barcode.string' => 'The barcode must be a valid text.',
+            'category.required' => 'Please select a product category.',
+            'category.Illuminate\Validation\Rules\Enum' => 'The selected category is invalid.',
         ];
     }
 
