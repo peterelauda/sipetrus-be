@@ -5,6 +5,7 @@ namespace App\Services\Product;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\GetProductsDTO;
 use App\DTOs\Product\SearchProductDTO;
+use App\DTOs\Product\UpdateProductDTO;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use Exception;
@@ -98,6 +99,26 @@ class ProductService
         $product = $this->productRepository->searchProduct($dto);
 
         return $product;
+    }
+
+    public function updateProductById(string $id, UpdateProductDTO $dto)
+    {
+        $userId = auth()->id();
+
+        $product = $this->productRepository
+            ->getById($id);
+
+        if (!$product || $product->user_id !== $userId) {
+            throw new Exception('Invalid product ID');
+        }
+
+        return $this->productRepository->update($id, [
+            'name' => $dto->name,
+            'price' => $dto->price,
+            'category' => $dto->category,
+            'cost_price' => $dto->costPrice,
+            'barcode' => $dto->barcode
+        ]);
     }
 
     public function generateProductCode(int $userId)
