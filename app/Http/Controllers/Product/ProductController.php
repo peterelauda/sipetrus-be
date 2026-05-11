@@ -5,13 +5,16 @@ namespace App\Http\Controllers\Product;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\GetProductsDTO;
 use App\DTOs\Product\SearchProductDTO;
+use App\DTOs\Product\UpdateProductDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateProductRequest;
 use App\Http\Requests\Product\GetProductsRequest;
 use App\Http\Requests\Product\SearchProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\CreateProductResource;
 use App\Http\Resources\Product\GetProductsResource;
 use App\Http\Resources\Product\SearchProductResource;
+use App\Http\Resources\Product\UpdateProductResource;
 use App\Services\Product\ProductService;
 use App\Traits\ApiLogger;
 use App\Traits\ApiResponser;
@@ -86,11 +89,24 @@ class ProductController extends Controller
             $data = $this->productService
                 ->searchProduct(SearchProductDTO::fromRequest($request));
 
-            return $this->success('Search product data success', SearchProductResource::collection($data), 200);
+            return $this->success('Search product data successfully', SearchProductResource::collection($data), 200);
         } catch (\Throwable $th) {
             $this->logError('Search product data failed: ', $th);
 
             return $this->error('Search product data failed', 400, $th->getMessage());
+        }
+    }
+
+    public function updateProductById($id, UpdateProductRequest $request)
+    {
+        try {
+            $data = $this->productService->updateProductById($id, UpdateProductDTO::fromRequest($request));
+
+            return $this->success('Update product successfully', new UpdateProductResource($data), 200);
+        } catch (\Throwable $th) {
+            $this->logError('Update product failed: ', $th);
+
+            return $this->error('Update product failed', 400, $th->getMessage());
         }
     }
 }
