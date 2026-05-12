@@ -109,4 +109,17 @@ class ProductController extends Controller
             return $this->error('Update product failed', 400, $th->getMessage());
         }
     }
+
+    public function deleteProductById($id)
+    {
+        try {
+            $this->productService->deleteProductById($id);
+
+            return $this->success('Delete product successfully', null, 204);
+        } catch (\Throwable $th) {
+            $this->logError('Delete product failed: ', $th);
+
+            return $this->error('Delete product failed', 400, $th->getMessage());
+        }
+    }
 }

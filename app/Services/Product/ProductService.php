@@ -121,6 +121,20 @@ class ProductService
         ]);
     }
 
+    public function deleteProductById(string $id)
+    {
+        $userId = auth()->id();
+
+        $product = $this->productRepository
+            ->getById($id);
+
+        if (!$product || $product->user_id !== $userId) {
+            throw new Exception('Invalid product ID');
+        }
+
+        $this->productRepository->delete($id);
+    }
+
     public function generateProductCode(int $userId)
     {
         $last = $this->productRepository->getLatestProduct($userId);
