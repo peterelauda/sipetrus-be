@@ -17,7 +17,6 @@ class SearchProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'user_id' => $this->user_id,
             'product_code' => $this->product_code,
             'barcode' => $this->barcode,
             'cost_price' => (float) $this->cost_price,

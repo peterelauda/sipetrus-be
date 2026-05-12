@@ -15,7 +15,6 @@ class CreateProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'user_id' => $this->user_id,
             'barcode' => $this->barcode,
             'name' => $this->name,
             'price' => (float) $this->price,
