@@ -40,10 +40,19 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->when($paymentMethod, function ($query) use ($paymentMethod) {
                 $query->where('payment_method', $paymentMethod->value);
             })
-            ->latest()
+            ->orderBy('id', 'desc')
             ->paginate(
                 perPage: $limit,
                 page: $page
             );
+    }
+
+    public function getTransactionDetail(string $id)
+    {
+        return $this->model
+            ->with([
+                'items.product'
+            ])
+            ->find($id);
     }
 }

@@ -47,6 +47,20 @@ class TransactionService
             );
     }
 
+    public function getTransactionById(string $id)
+    {
+        $userId = auth()->id();
+
+        $transaction = $this->transactionRepository
+            ->getTransactionDetail($id);
+
+        if (!$transaction || $transaction->user_id !== $userId) {
+            throw new \Exception('Invalid transaction ID');
+        }
+
+        return $transaction;
+    }
+
     public function storeTransaction(StoreTransactionDTO $dto)
     {
         $userId = auth()->id();
