@@ -19,10 +19,15 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [ProductController::class, 'createProduct']);
     Route::get('/', [ProductController::class, 'getProducts']);
-    Route::get('/{id}', [ProductController::class, 'getProductById']);
     Route::get('/search', [ProductController::class, 'searchProduct']);
+    Route::get('/{id}', [ProductController::class, 'getProductById']);
+    Route::put('/{id}', [ProductController::class, 'updateProductById']);
+    Route::post('/{id}/adjust-stock', [ProductController::class, 'adjustStock']);
+    Route::delete('/{id}', [ProductController::class, 'deleteProductById']);
 });
 
 Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [TransactionController::class, 'getTransactions']);
+    Route::get('/{id}', [TransactionController::class, 'getTransactionById']);
     Route::post('/', [TransactionController::class, 'storeTransaction']);
 });

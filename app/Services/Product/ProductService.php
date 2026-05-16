@@ -2,9 +2,11 @@
 
 namespace App\Services\Product;
 
+use App\DTOs\Product\AdjustStockDTO;
 use App\DTOs\Product\CreateProductDTO;
 use App\DTOs\Product\GetProductsDTO;
 use App\DTOs\Product\SearchProductDTO;
+use App\DTOs\Product\UpdateProductDTO;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use Exception;
@@ -98,6 +100,94 @@ class ProductService
         $product = $this->productRepository->searchProduct($dto);
 
         return $product;
+    }
+
+    public function updateProductById(string $id, UpdateProductDTO $dto)
+    {
+        $userId = auth()->id();
+
+        $product = $this->productRepository
+            ->getById($id);
+
+        if (!$product || $product->user_id !== $userId) {
+            throw new Exception('Invalid product ID');
+        }
+
+        return $this->productRepository->update($id, [
+            'name' => $dto->name,
+            'price' => $dto->price,
+            'category' => $dto->category,
+            'cost_price' => $dto->costPrice,
+            'barcode' => $dto->barcode
+        ]);
+    }
+
+    public function adjustStock(string $id, AdjustStockDTO $dto)
+    {
+        $userId = auth()->id();
+
+        $product = $this->productRepository
+            ->getById($id);
+
+        if (!$product || $product->user_id !== $userId) {
+            throw new Exception('Invalid product ID');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            if ($dto->type == 'in') {
+                $this->productRepository->update($id, [
+                    'stock' => (int) $product->stock + $dto->qty
+                ]);
+
+                $stockMovement = $this->stockMovementRepository->create([
+                    'user_id' => $userId,
+                    'product_id' => $id,
+                    'type' => $dto->type,
+                    'qty' => $dto->qty,
+                    'reference' => 'MANUAL_ADJUSTMENT'
+                ]);
+
+                DB::commit();
+
+                return $stockMovement;
+            } else {
+                $this->productRepository->update($id, [
+                    'stock' => (int) $product->stock - $dto->qty
+                ]);
+
+                $stockMovement = $this->stockMovementRepository->create([
+                    'user_id' => $userId,
+                    'product_id' => $id,
+                    'type' => $dto->type,
+                    'qty' => $dto->qty,
+                    'reference' => 'DAMAGED_PRODUCT'
+                ]);
+
+                DB::commit();
+
+                return $stockMovement;
+            }
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            throw $th;
+        }
+    }
+
+    public function deleteProductById(string $id)
+    {
+        $userId = auth()->id();
+
+        $product = $this->productRepository
+            ->getById($id);
+
+        if (!$product || $product->user_id !== $userId) {
+            throw new Exception('Invalid product ID');
+        }
+
+        $this->productRepository->delete($id);
     }
 
     public function generateProductCode(int $userId)

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Product;
+namespace App\Http\Resources\Transaction;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SearchProductResource extends JsonResource
+class TransactionItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,14 +16,12 @@ class SearchProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'product_code' => $this->product_code,
-            'barcode' => $this->barcode,
+            'product_id' => $this->product_id,
+            'product_name' => $this->product?->name,
+            'qty' => $this->qty,
             'cost_price' => (float) $this->cost_price,
             'price' => (float) $this->price,
-            'stock' => (int) $this->stock,
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'subtotal' => (float) $this->subtotal,
         ];
     }
 }
