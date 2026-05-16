@@ -2,7 +2,9 @@
 
 namespace App\Services\Transaction;
 
+use App\DTOs\Transaction\GetTransactionDTO;
 use App\DTOs\Transaction\StoreTransactionDTO;
+use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
@@ -31,6 +33,32 @@ class TransactionService
         $this->transactionRepository = $transactionRepository;
         $this->transactionItemRepository = $transactionItemRepository;
         $this->stockMovementRepository = $stockMovementRepository;
+    }
+
+    public function getTransactions(GetTransactionDTO $dto)
+    {
+        return $this->transactionRepository
+            ->getTransactions(
+                $dto->page,
+                $dto->limit,
+                Carbon::parse($dto->startDate),
+                Carbon::parse($dto->endDate),
+                PaymentMethodEnum::from($dto->paymentMethod)
+            );
+    }
+
+    public function getTransactionById(string $id)
+    {
+        $userId = auth()->id();
+
+        $transaction = $this->transactionRepository
+            ->getTransactionDetail($id);
+
+        if (!$transaction || $transaction->user_id !== $userId) {
+            throw new \Exception('Invalid transaction ID');
+        }
+
+        return $transaction;
     }
 
     public function storeTransaction(StoreTransactionDTO $dto)

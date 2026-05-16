@@ -27,5 +27,7 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
 });
 
 Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [TransactionController::class, 'getTransactions']);
+    Route::get('/{id}', [TransactionController::class, 'getTransactionById']);
     Route::post('/', [TransactionController::class, 'storeTransaction']);
 });
