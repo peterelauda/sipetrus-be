@@ -30,4 +30,5 @@ Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [TransactionController::class, 'getTransactions']);
     Route::get('/{id}', [TransactionController::class, 'getTransactionById']);
     Route::post('/', [TransactionController::class, 'storeTransaction']);
+    Route::put('{id}/cancel', [TransactionController::class, 'cancelTransactionById']);
 });

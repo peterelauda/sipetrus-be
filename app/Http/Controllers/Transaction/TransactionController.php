@@ -65,4 +65,17 @@ class TransactionController extends Controller
             return $this->error('Failed when store transaction', $e->getCode(), $e->getMessage());
         }
     }
+
+    public function cancelTransactionById($id)
+    {
+        try {
+            $this->transactionService->cancelTransactionById($id);
+
+            return $this->success('Cancel transaction successfully', null, 204);
+        } catch (\Exception $e) {
+            $this->logError('Failed when cancel transaction', $e);
+
+            return $this->error('Failed when cancel transaction', 400, null);
+        }
+    }
 }

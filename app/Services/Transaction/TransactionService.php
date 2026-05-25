@@ -148,6 +148,11 @@ class TransactionService
         return $transaction;
     }
 
+    public function cancelTransactionById(string $id)
+    {
+        $this->transactionRepository->cancelTransactionById($id);
+    }
+
     public function generateInvoiceNumber()
     {
         $counter = $this->transactionRepository->getLatestInvoiceByDate(Carbon::now());
