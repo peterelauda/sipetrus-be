@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Stock\StockMovementController;
 use App\Http\Controllers\Transaction\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,10 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::put('/{id}', [ProductController::class, 'updateProductById']);
     Route::post('/{id}/adjust-stock', [ProductController::class, 'adjustStock']);
     Route::delete('/{id}', [ProductController::class, 'deleteProductById']);
+});
+
+Route::prefix('/stock-movements')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [StockMovementController::class, 'getStockMovements']);
 });
 
 Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
