@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquents\Transaction;
 
 use App\Enums\PaymentMethodEnum;
+use App\Enums\PaymentStatusEnum;
 use App\Models\Transaction;
 use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
 use App\Repositories\Eloquents\BaseRepository;
@@ -54,5 +55,13 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
                 'items.product'
             ])
             ->find($id);
+    }
+
+    public function cancelTransactionById(string $id)
+    {
+        $this->model
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->update(['status' => PaymentStatusEnum::CANCELLED]);
     }
 }
