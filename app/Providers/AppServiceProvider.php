@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\Dashboard\DashboardRepositoryInterface;
+use App\Repositories\Eloquents\Dashboard\DashboardRepository;
 use App\Repositories\Contracts\Transaction\TransactionItemRepositoryInterface;
 use App\Repositories\Eloquents\Transaction\TransactionItemRepository;
 use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(TransactionItemRepositoryInterface::class, TransactionItemRepository::class);
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
         $this->app->bind(StockMovementRepositoryInterface::class, StockMovementRepository::class);

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Stock\StockMovementController;
 use App\Http\Controllers\Transaction\TransactionController;
@@ -36,4 +37,8 @@ Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [TransactionController::class, 'getTransactionById']);
     Route::post('/', [TransactionController::class, 'storeTransaction']);
     Route::put('{id}/cancel', [TransactionController::class, 'cancelTransactionById']);
+});
+
+Route::prefix('/dashboard')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [DashboardController::class, 'getDashboard']);
 });
