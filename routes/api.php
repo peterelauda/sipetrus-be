@@ -3,6 +3,7 @@
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Stock\StockMovementController;
 use App\Http\Controllers\Transaction\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +42,8 @@ Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/dashboard')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [DashboardController::class, 'getDashboard']);
+});
+
+Route::prefix('/reports')->middleware('auth:sanctum')->group(function () {
+    Route::get('/sales', [ReportController::class, 'getSalesReport']);
 });
