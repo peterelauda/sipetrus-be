@@ -176,6 +176,14 @@ class ProductService
         }
     }
 
+    public function getLowStockProducts()
+    {
+        $userId = auth()->id();
+
+        return $this->productRepository
+            ->getLowStockProducts($userId);
+    }
+
     public function deleteProductById(string $id)
     {
         $userId = auth()->id();

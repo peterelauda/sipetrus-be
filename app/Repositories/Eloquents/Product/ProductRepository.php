@@ -69,4 +69,13 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->get()
             ->keyBy('id');
     }
+
+    public function getLowStockProducts(int $userId)
+    {
+        return $this->model
+            ->where('user_id', $userId)
+            ->where('stock', '<=', 5)
+            ->orderBy('stock')
+            ->get();
+    }
 }

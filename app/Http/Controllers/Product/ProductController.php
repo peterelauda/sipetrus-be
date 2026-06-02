@@ -16,6 +16,7 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Http\Resources\Product\AdjustStockResource;
 use App\Http\Resources\Product\CreateProductResource;
 use App\Http\Resources\Product\GetProductsResource;
+use App\Http\Resources\Product\LowStockProductResource;
 use App\Http\Resources\Product\SearchProductResource;
 use App\Http\Resources\Product\UpdateProductResource;
 use App\Services\Product\ProductService;
@@ -123,6 +124,31 @@ class ProductController extends Controller
             $this->logError('Adjust product stock failed: ', $th);
 
             return $this->error('Adjust product stock failed', 400, $th->getMessage());
+        }
+    }
+
+    public function getLowStockProducts()
+    {
+        try {
+            $data = $this->productService
+                ->getLowStockProducts();
+
+            return $this->success(
+                'Get low stock products successfully',
+                LowStockProductResource::collection($data),
+                200
+            );
+        } catch (\Throwable $th) {
+            $this->logError(
+                'Get low stock products failed: ',
+                $th
+            );
+
+            return $this->error(
+                'Get low stock products failed',
+                400,
+                $th->getMessage()
+            );
         }
     }
 
