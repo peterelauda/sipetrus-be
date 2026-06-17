@@ -7,25 +7,25 @@ use Illuminate\Support\Carbon;
 interface ReportRepositoryInterface
 {
     public function getTotalSales(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     );
 
     public function getTotalTransactions(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     );
 
     public function getTotalProfit(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     );
 
     public function getItemsSold(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     );

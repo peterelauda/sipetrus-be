@@ -49,12 +49,12 @@ class TransactionService
 
     public function getTransactionById(string $id)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $transaction = $this->transactionRepository
             ->getTransactionDetail($id);
 
-        if (!$transaction || $transaction->user_id !== $userId) {
+        if (!$transaction || $transaction->store_id !== $storeId) {
             throw new \Exception('Invalid transaction ID');
         }
 
@@ -63,7 +63,7 @@ class TransactionService
 
     public function storeTransaction(StoreTransactionDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $productIds = collect($dto->items)->pluck('productId')->toArray();
 
@@ -107,7 +107,7 @@ class TransactionService
 
         try {
             $transaction = $this->transactionRepository->create([
-                'user_id' => $userId,
+                'store_id' => $storeId,
                 'invoice_number' => $invoiceNumber,
                 'total' => $total,
                 'paid_amount' => $dto->paidAmount,
@@ -118,7 +118,7 @@ class TransactionService
 
             foreach ($itemsData as $item) {
                 $this->transactionItemRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'transaction_id' => $transaction->id,
                     'product_id' => $item['product']->id,
                     'qty' => $item['qty'],
@@ -130,7 +130,7 @@ class TransactionService
                 $this->productRepository->update($item['product']->id, ['stock' => $item['product']->stock - $item['qty']]);
 
                 $this->stockMovementRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'product_id' => $item['product']->id,
                     'type' => 'out',
                     'qty' => $item['qty'],

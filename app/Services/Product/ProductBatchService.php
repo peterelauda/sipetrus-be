@@ -32,12 +32,12 @@ class ProductBatchService
         string $productId,
         CreateProductBatchDTO $dto
     ) {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $product = $this->productRepository
             ->getById($productId);
 
-        if (!$product || $product->user_id !== $userId) {
+        if (!$product || $product->store_id !== $storeId) {
             throw new Exception('Invalid product ID');
         }
 
@@ -59,7 +59,7 @@ class ProductBatchService
             );
 
             $this->stockMovementRepository->create([
-                'user_id' => $userId,
+                'store_id' => $storeId,
                 'product_id' => $product->id,
                 'type' => 'in',
                 'qty' => $dto->stock,

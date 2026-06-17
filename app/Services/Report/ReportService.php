@@ -21,33 +21,33 @@ class ReportService
     public function getSalesReport(
         SalesReportDTO $dto
     ): array {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         return [
             'total_sales' => $this->reportRepository
                 ->getTotalSales(
-                    $userId,
+                    $storeId,
                     $dto->startDate,
                     $dto->endDate
                 ),
 
             'total_transactions' => $this->reportRepository
                 ->getTotalTransactions(
-                    $userId,
+                    $storeId,
                     $dto->startDate,
                     $dto->endDate
                 ),
 
             'total_profit' => $this->reportRepository
                 ->getTotalProfit(
-                    $userId,
+                    $storeId,
                     $dto->startDate,
                     $dto->endDate
                 ) ?? 0,
 
             'items_sold' => $this->reportRepository
                 ->getItemsSold(
-                    $userId,
+                    $storeId,
                     $dto->startDate,
                     $dto->endDate
                 ),

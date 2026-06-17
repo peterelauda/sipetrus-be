@@ -17,10 +17,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         $this->model = $model;
     }
 
-    public function getLatestProduct(string $userId)
+    public function getLatestProduct(string $storeId)
     {
         return $this->model
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->where('barcode', 'LIKE', '%P%')
             ->orderBy('id', 'desc')
             ->lockForUpdate()
@@ -28,12 +28,12 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     }
 
     public function getProductByNameAndCode(
-        string $userId,
+        string $storeId,
         string $productName,
         ?string $barcode
     ) {
         return $this->model
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->where('name', 'LIKE', '%' . $productName . '%')
             ->when($barcode, function ($q) use ($barcode) {
                 $q->where('barcode', $barcode);
@@ -41,10 +41,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->first();
     }
 
-    public function getProducts(string $userId, GetProductsDTO $dto)
+    public function getProducts(string $storeId, GetProductsDTO $dto)
     {
         return $this->model
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->when($dto->name, function ($q, $name) {
                 $q->where('name', 'like', '%' . $name . '%');
             })
@@ -57,7 +57,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function searchProduct(SearchProductDTO $dto)
     {
         return Product::search($dto->keyword)
-            ->where('user_id', auth()->id())
+            ->where('store_id', auth()->user()->store_id)
             ->paginate(10);
     }
 
@@ -70,10 +70,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             ->keyBy('id');
     }
 
-    public function getLowStockProducts(int $userId)
+    public function getLowStockProducts(int $storeId)
     {
         return $this->model
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->where('stock', '<=', 5)
             ->orderBy('stock')
             ->get();
