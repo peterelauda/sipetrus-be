@@ -21,4 +21,13 @@ class ProductBatchRepository extends BaseRepository implements ProductBatchRepos
             ->lockForUpdate()
             ->first();
     }
+
+    public function getProductBatches(int $productId)
+    {
+        return $this->model
+            ->where('product_id', $productId)
+            ->orderBy('expired_date', 'asc')
+            ->orderBy('stock', 'desc')
+            ->paginate(10);
+    }
 }

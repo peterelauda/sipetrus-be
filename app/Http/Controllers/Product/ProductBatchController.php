@@ -52,4 +52,29 @@ class ProductBatchController extends Controller
             );
         }
     }
+
+    public function getProductBatches(string $id)
+    {
+        try {
+            $batches = $this->productBatchService
+                ->getProductBatches($id);
+
+            return $this->success(
+                'Product batches retrieved successfully',
+                ProductBatchResource::collection($batches),
+                200
+            );
+        } catch (\Throwable $th) {
+            $this->logError(
+                'Failed to get product batches: ',
+                $th
+            );
+
+            return $this->error(
+                'Failed to retrieve product batches',
+                400,
+                $th->getMessage()
+            );
+        }
+    }
 }

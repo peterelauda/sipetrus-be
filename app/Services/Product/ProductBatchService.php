@@ -76,6 +76,25 @@ class ProductBatchService
         }
     }
 
+    public function getProductBatches(
+        string $productId
+    ) {
+        $product = $this->productRepository
+            ->getById($productId);
+
+        if (
+            !$product ||
+            $product->store_id !== auth()->user()->store_id
+        ) {
+            throw new Exception('Invalid product ID');
+        }
+
+        return $this->productBatchRepository
+            ->getProductBatches(
+                (int) $productId
+            );
+    }
+
     /**
      * Generate Batch Number
      *

@@ -30,6 +30,7 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::post('/{id}/adjust-stock', [ProductController::class, 'adjustStock'])->middleware('role:admin');
     Route::delete('/{id}', [ProductController::class, 'deleteProductById'])->middleware('role:admin');
     Route::post('/{id}/batches', [ProductBatchController::class, 'createBatch'])->middleware('role:admin');
+    Route::get('/{id}/batches', [ProductBatchController::class, 'getProductBatches']);
 });
 
 Route::prefix('/stock-movements')->middleware('auth:sanctum')->group(function () {
