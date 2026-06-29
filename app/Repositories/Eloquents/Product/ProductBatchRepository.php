@@ -30,4 +30,40 @@ class ProductBatchRepository extends BaseRepository implements ProductBatchRepos
             ->orderBy('stock', 'desc')
             ->paginate(10);
     }
+
+    public function getExpiredStocks(int $storeId)
+    {
+        return $this->model
+            ->with('product')
+            ->whereHas('product', function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            })
+            ->where('stock', '>', 0)
+            ->whereDate(
+                'expired_date',
+                '<',
+                today()
+            )
+            ->orderBy('expired_date')
+            ->paginate(10);
+    }
+
+    public function getNearExpiredStocks(int $storeId)
+    {
+        return $this->model
+            ->with('product')
+            ->whereHas('product', function ($q) use ($storeId) {
+                $q->where('store_id', $storeId);
+            })
+            ->where('stock', '>', 0)
+            ->whereBetween(
+                'expired_date',
+                [
+                    today(),
+                    today()->addDays(30)
+                ]
+            )
+            ->orderBy('expired_date')
+            ->paginate(10);
+    }
 }

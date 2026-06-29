@@ -6,6 +6,7 @@ use App\DTOs\Product\CreateProductBatchDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\CreateProductBatchRequest;
 use App\Http\Resources\Product\ProductBatchResource;
+use App\Http\Resources\Stock\BatchStockResource;
 use App\Services\Product\ProductBatchService;
 use App\Traits\ApiLogger;
 use App\Traits\ApiResponser;
@@ -72,6 +73,56 @@ class ProductBatchController extends Controller
 
             return $this->error(
                 'Failed to retrieve product batches',
+                400,
+                $th->getMessage()
+            );
+        }
+    }
+
+    public function getExpiredStocks()
+    {
+        try {
+            $data = $this->productBatchService
+                ->getExpiredStocks();
+
+            return $this->success(
+                'Expired stock retrieved successfully',
+                BatchStockResource::collection($data),
+                200
+            );
+        } catch (\Throwable $th) {
+            $this->logError(
+                'Failed to get expired stocks: ',
+                $th
+            );
+
+            return $this->error(
+                'Failed to retrieve expired stocks',
+                400,
+                $th->getMessage()
+            );
+        }
+    }
+
+    public function getNearExpiredStocks()
+    {
+        try {
+            $data = $this->productBatchService
+                ->getNearExpiredStocks();
+
+            return $this->success(
+                'Near expired stock retrieved successfully',
+                BatchStockResource::collection($data),
+                200
+            );
+        } catch (\Throwable $th) {
+            $this->logError(
+                'Failed to get near expired stocks: ',
+                $th
+            );
+
+            return $this->error(
+                'Failed to retrieve near expired stocks',
                 400,
                 $th->getMessage()
             );

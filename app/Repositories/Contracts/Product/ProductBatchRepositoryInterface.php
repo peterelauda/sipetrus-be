@@ -8,4 +8,6 @@ interface ProductBatchRepositoryInterface extends BaseRepositoryInterface
 {
     public function getLatestBatchByProduct(int $productId);
     public function getProductBatches(int $productId);
+    public function getExpiredStocks(int $storeId);
+    public function getNearExpiredStocks(int $storeId);
 }

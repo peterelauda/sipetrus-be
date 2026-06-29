@@ -95,6 +95,22 @@ class ProductBatchService
             );
     }
 
+    public function getExpiredStocks()
+    {
+        $storeId = auth()->user()->store_id;
+
+        return $this->productBatchRepository
+            ->getExpiredStocks($storeId);
+    }
+
+    public function getNearExpiredStocks()
+    {
+        $storeId = auth()->user()->store_id;
+
+        return $this->productBatchRepository
+            ->getNearExpiredStocks($storeId);
+    }
+
     /**
      * Generate Batch Number
      *

@@ -33,6 +33,11 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}/batches', [ProductBatchController::class, 'getProductBatches']);
 });
 
+Route::prefix('/stocks')->middleware('auth:sanctum')->group(function () {
+    Route::get('/expired-stock', [ProductBatchController::class, 'getExpiredStocks']);
+    Route::get('/near-expired', [ProductBatchController::class, 'getNearExpiredStocks']);
+});
+
 Route::prefix('/stock-movements')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [StockMovementController::class, 'getStockMovements'])->middleware('role:admin');
 });
