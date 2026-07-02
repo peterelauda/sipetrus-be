@@ -66,4 +66,16 @@ class ProductBatchRepository extends BaseRepository implements ProductBatchRepos
             ->orderBy('expired_date')
             ->paginate(10);
     }
+
+    public function getAvailableBatchesByProduct(
+        int $productId
+    ) {
+        return $this->model
+            ->where('product_id', $productId)
+            ->where('stock', '>', 0)
+            ->whereDate('expired_date', '>=', today())
+            ->orderBy('expired_date')
+            ->lockForUpdate()
+            ->get();
+    }
 }

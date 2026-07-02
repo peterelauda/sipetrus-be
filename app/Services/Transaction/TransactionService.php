@@ -6,10 +6,12 @@ use App\DTOs\Transaction\GetTransactionDTO;
 use App\DTOs\Transaction\StoreTransactionDTO;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
+use App\Repositories\Contracts\Product\ProductBatchRepositoryInterface;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use App\Repositories\Contracts\Transaction\TransactionItemRepositoryInterface;
 use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
+use App\Repositories\Contracts\Transaction\TxItemBatchRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +21,8 @@ class TransactionService
     protected $transactionRepository;
     protected $transactionItemRepository;
     protected $stockMovementRepository;
+    protected $productBatchRepository;
+    protected $transactionItemBatchRepository;
 
     /**
      * Create a new class instance.
@@ -28,11 +32,15 @@ class TransactionService
         TransactionRepositoryInterface $transactionRepository,
         TransactionItemRepositoryInterface $transactionItemRepository,
         StockMovementRepositoryInterface $stockMovementRepository,
+        ProductBatchRepositoryInterface $productBatchRepository,
+        TxItemBatchRepositoryInterface $transactionItemBatchRepository,
     ) {
         $this->productRepository = $productRepository;
         $this->transactionRepository = $transactionRepository;
         $this->transactionItemRepository = $transactionItemRepository;
         $this->stockMovementRepository = $stockMovementRepository;
+        $this->productBatchRepository = $productBatchRepository;
+        $this->transactionItemBatchRepository = $transactionItemBatchRepository;
     }
 
     public function getTransactions(GetTransactionDTO $dto)
@@ -80,8 +88,18 @@ class TransactionService
                 throw new \Exception("Product not found", 404);
             }
 
-            if ($product->stock < $item->qty) {
-                throw new \Exception("Stock not enough for {$product->name}", 422);
+            $batches = $this->productBatchRepository
+                ->getAvailableBatchesByProduct(
+                    $product->id
+                );
+
+            $availableStock = $batches->sum('stock');
+
+            if ($availableStock < $item->qty) {
+                throw new \Exception(
+                    "Stock not enough for {$product->name}",
+                    422
+                );
             }
 
             $subtotal = $product->price * $item->qty;
@@ -117,7 +135,7 @@ class TransactionService
             ]);
 
             foreach ($itemsData as $item) {
-                $this->transactionItemRepository->create([
+                $transactionItem = $this->transactionItemRepository->create([
                     'store_id' => $storeId,
                     'transaction_id' => $transaction->id,
                     'product_id' => $item['product']->id,
@@ -126,6 +144,42 @@ class TransactionService
                     'price' => $item['price'],
                     'subtotal' => $item['subtotal'],
                 ]);
+
+                // Reduce stock from product batches
+
+                $remainingQty = $item['qty'];
+
+                $batches = $this->productBatchRepository
+                    ->getAvailableBatchesByProduct(
+                        $item['product']->id
+                    );
+
+                foreach ($batches as $batch) {
+
+                    if ($remainingQty <= 0) {
+                        break;
+                    }
+
+                    $deductQty = min(
+                        $batch->stock,
+                        $remainingQty
+                    );
+
+                    $this->transactionItemBatchRepository->create([
+                        'transaction_item_id' => $transactionItem->id,
+                        'product_batch_id' => $batch->id,
+                        'qty' => $deductQty,
+                    ]);
+
+                    $this->productBatchRepository->update(
+                        $batch->id,
+                        [
+                            'stock' => $batch->stock - $deductQty
+                        ]
+                    );
+
+                    $remainingQty -= $deductQty;
+                }
 
                 $this->productRepository->update($item['product']->id, ['stock' => $item['product']->stock - $item['qty']]);
 
