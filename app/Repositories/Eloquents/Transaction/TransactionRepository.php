@@ -57,6 +57,17 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->find($id);
     }
 
+    public function getTransactionById(string $id, int $storeId)
+    {
+        return $this->model
+            ->with([
+                'items.batchAllocations'
+            ])
+            ->where('id', $id)
+            ->where('store_id', $storeId)
+            ->first();
+    }
+
     public function cancelTransactionById(string $id)
     {
         $this->model

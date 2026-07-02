@@ -204,7 +204,89 @@ class TransactionService
 
     public function cancelTransactionById(string $id)
     {
-        $this->transactionRepository->cancelTransactionById($id);
+        $storeId = auth()->user()->store_id;
+
+        $transaction = $this->transactionRepository
+            ->getTransactionById(
+                $id,
+                $storeId
+            );
+
+        if (!$transaction) {
+            throw new \Exception(
+                'Transaction not found'
+            );
+        }
+
+        if (
+            $transaction->status ===
+            PaymentStatusEnum::CANCELLED
+        ) {
+            throw new \Exception(
+                'Transaction already cancelled'
+            );
+        }
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($transaction->items as $item) {
+                $product = $this->productRepository
+                    ->getById(
+                        $item->product_id
+                    );
+
+                // Refund product stock
+                $this->productRepository->update(
+                    $item->product_id,
+                    [
+                        'stock' =>
+                            $product->stock +
+                            $item->qty
+                    ]
+                );
+
+                // Refund stock in product batches
+                foreach ($item->batchAllocations as $allocation) {
+                    $batch = $this->productBatchRepository
+                        ->getById(
+                            $allocation->product_batch_id
+                        );
+
+                    $this->productBatchRepository
+                        ->update(
+                            $batch->id,
+                            [
+                                'stock' =>
+                                    $batch->stock +
+                                    $allocation->qty
+                            ]
+                        );
+                }
+
+                $this->stockMovementRepository
+                    ->create([
+                        'store_id' => $storeId,
+                        'product_id' => $item->product_id,
+                        'type' => 'in',
+                        'qty' => $item->qty,
+                        'reference' =>
+                            'CANCEL-' .
+                            $transaction->invoice_number,
+                    ]);
+            }
+
+            $this->transactionRepository
+                ->cancelTransactionById(
+                    $id
+                );
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            throw $th;
+        }
     }
 
     public function generateInvoiceNumber()
