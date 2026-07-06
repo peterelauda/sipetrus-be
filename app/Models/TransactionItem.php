@@ -19,4 +19,12 @@ class TransactionItem extends Model
             TransactionItemBatch::class
         );
     }
+
+    public function transaction()
+    {
+        return $this->belongsTo(
+            Transaction::class,
+            'transaction_id'
+        );
+    }
 }

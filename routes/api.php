@@ -64,4 +64,8 @@ Route::prefix('/dashboard')->middleware('auth:sanctum')->group(function () {
 
 Route::prefix('/reports')->middleware('auth:sanctum')->group(function () {
     Route::get('/sales', [ReportController::class, 'getSalesReport'])->middleware('role:admin');
+    Route::get('/cash-flow', [ReportController::class, 'getCashFlow']);
+    Route::get('/cash-flow/excel', [ReportController::class, 'exportCashFlow']);
+    Route::get('/profit-loss', [ReportController::class, 'getProfitLoss']);
+    Route::get('/profit-loss/excel', [ReportController::class, 'exportProfitLoss']);
 });
