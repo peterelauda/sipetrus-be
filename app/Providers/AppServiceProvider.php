@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\Expense\ExpenseRepositoryInterface;
+use App\Repositories\Eloquents\Expense\ExpenseRepository;
 use App\Repositories\Contracts\Transaction\TxItemBatchRepositoryInterface;
 use App\Repositories\Eloquents\Transaction\TxItemBatchRepository;
 use App\Repositories\Contracts\Product\ProductBatchRepositoryInterface;
@@ -29,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(ExpenseRepositoryInterface::class, ExpenseRepository::class);
         $this->app->bind(TxItemBatchRepositoryInterface::class, TxItemBatchRepository::class);
         $this->app->bind(ProductBatchRepositoryInterface::class, ProductBatchRepository::class);
         $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);

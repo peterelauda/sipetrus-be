@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Expense\ExpenseController;
 use App\Http\Controllers\Product\ProductBatchController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\ReportController;
@@ -47,6 +48,14 @@ Route::prefix('/transactions')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [TransactionController::class, 'getTransactionById']);
     Route::post('/', [TransactionController::class, 'storeTransaction']);
     Route::put('{id}/cancel', [TransactionController::class, 'cancelTransactionById'])->middleware('role:admin');
+});
+
+Route::prefix('/expenses')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [ExpenseController::class, 'createExpense'])->middleware('role:admin');
+    Route::get('/', [ExpenseController::class, 'getExpenses']);
+    Route::get('/{id}', [ExpenseController::class, 'getExpenseById']);
+    Route::put('/{id}', [ExpenseController::class, 'updateExpense'])->middleware('role:admin');
+    Route::delete('/{id}', [ExpenseController::class, 'deleteExpense'])->middleware('role:admin');
 });
 
 Route::prefix('/dashboard')->middleware('auth:sanctum')->group(function () {
