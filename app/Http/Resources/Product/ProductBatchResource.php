@@ -5,7 +5,7 @@ namespace App\Http\Resources\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SearchProductResource extends JsonResource
+class ProductBatchResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,11 +16,10 @@ class SearchProductResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'barcode' => $this->barcode,
-            'cost_price' => (float) $this->cost_price,
-            'price' => (float) $this->price,
-            'stock' => (int) $this->stock,
+            'product_id' => $this->product_id,
+            'batch_number' => $this->batch_number,
+            'stock' => $this->stock,
+            'expired_date' => $this->expired_date?->format('Y-m-d'),
             'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

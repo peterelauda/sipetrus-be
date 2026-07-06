@@ -15,7 +15,7 @@ class StoreTransactionResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'user_id' => $this->user_id,
+            'store_id' => $this->store_id,
             'invoice_number' => $this->invoice_number,
             'total' => (int) $this->total,
             'paid_amount' => (int) $this->paid_amount,

@@ -10,12 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('transaction_items', function (Blueprint $table) {
-            $table->foreignId('store_id')
-                ->nullable()
-                ->after('id')
+        Schema::create('transaction_item_batches', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('transaction_item_id')
                 ->constrained()
                 ->cascadeOnDelete();
+            $table->foreignId('product_batch_id')
+                ->constrained()
+                ->cascadeOnDelete();
+            $table->integer('qty');
+            $table->timestamps();
         });
     }
 
@@ -24,9 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('transaction_items', function (Blueprint $table) {
-            $table->dropForeign(['store_id']);
-            $table->dropColumn('store_id');
-        });
+        Schema::dropIfExists('transaction_item_batches');
     }
 };

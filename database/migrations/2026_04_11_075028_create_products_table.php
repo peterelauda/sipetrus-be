@@ -13,13 +13,13 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('store_id')->constrained()->cascadeOnDelete();
             $table->string('barcode')->nullable();
             $table->enum('category', ['Staples', 'Seasonings', 'Beverages', 'Instant', 'Cleaning', 'Toiletries', 'Essentials', 'Snacks', 'Dairy', 'Bakery']);
             $table->decimal('cost_price', 12, 2)->default(0);
             $table->decimal('price', 12, 2);
             $table->integer('stock')->default(0);
-            $table->unique(['user_id', 'barcode']);
+            $table->unique(['store_id', 'barcode']);
             $table->timestamps();
         });
     }

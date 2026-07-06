@@ -20,7 +20,7 @@ class StockMovementRepository extends BaseRepository implements StockMovementRep
     {
         return $this->model
             ->with('product')
-            ->where('user_id', auth()->id())
+            ->where('store_id', auth()->user()->store_id)
             ->when($dto->productId, function ($query) use ($dto) {
                 $query->where('product_id', $dto->productId);
             })

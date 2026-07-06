@@ -30,10 +30,10 @@ class ProductService
 
     public function createProduct(CreateProductDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $isProductExist = $this->productRepository
-            ->getProductByNameAndCode($userId, $dto->name, $dto->barcode);
+            ->getProductByNameAndCode($storeId, $dto->name, $dto->barcode);
 
         if ($isProductExist) {
             throw new Exception('Product already registered');
@@ -43,8 +43,8 @@ class ProductService
 
         try {
             $product = $this->productRepository->create([
-                'user_id' => $userId,
-                'barcode' => $dto->barcode ?? $this->generateProductCode($userId),
+                'store_id' => $storeId,
+                'barcode' => $dto->barcode ?? $this->generateProductCode($storeId),
                 'name' => $dto->name,
                 'price' => $dto->price,
                 'cost_price' => $dto->costPrice,
@@ -54,7 +54,7 @@ class ProductService
 
             if ($dto->stock > 0) {
                 $this->stockMovementRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'product_id' => $product->id,
                     'type' => 'in',
                     'qty' => $dto->stock,
@@ -74,21 +74,21 @@ class ProductService
 
     public function getProducts(GetProductsDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
-        $products = $this->productRepository->getProducts($userId, $dto);
+        $products = $this->productRepository->getProducts($storeId, $dto);
 
         return $products;
     }
 
     public function getProductById(string $id)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $product = $this->productRepository
             ->getById($id);
 
-        if (!$product || $product->user_id !== $userId) {
+        if (!$product || $product->store_id !== $storeId) {
             throw new Exception('Invalid product ID');
         }
 
@@ -104,12 +104,12 @@ class ProductService
 
     public function updateProductById(string $id, UpdateProductDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $product = $this->productRepository
             ->getById($id);
 
-        if (!$product || $product->user_id !== $userId) {
+        if (!$product || $product->store_id !== $storeId) {
             throw new Exception('Invalid product ID');
         }
 
@@ -124,12 +124,12 @@ class ProductService
 
     public function adjustStock(string $id, AdjustStockDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $product = $this->productRepository
             ->getById($id);
 
-        if (!$product || $product->user_id !== $userId) {
+        if (!$product || $product->store_id !== $storeId) {
             throw new Exception('Invalid product ID');
         }
 
@@ -142,7 +142,7 @@ class ProductService
                 ]);
 
                 $stockMovement = $this->stockMovementRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'product_id' => $id,
                     'type' => $dto->type,
                     'qty' => $dto->qty,
@@ -158,7 +158,7 @@ class ProductService
                 ]);
 
                 $stockMovement = $this->stockMovementRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'product_id' => $id,
                     'type' => $dto->type,
                     'qty' => $dto->qty,
@@ -178,29 +178,29 @@ class ProductService
 
     public function getLowStockProducts()
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         return $this->productRepository
-            ->getLowStockProducts($userId);
+            ->getLowStockProducts($storeId);
     }
 
     public function deleteProductById(string $id)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $product = $this->productRepository
             ->getById($id);
 
-        if (!$product || $product->user_id !== $userId) {
+        if (!$product || $product->store_id !== $storeId) {
             throw new Exception('Invalid product ID');
         }
 
         $this->productRepository->delete($id);
     }
 
-    public function generateProductCode(int $userId)
+    public function generateProductCode(int $storeId)
     {
-        $last = $this->productRepository->getLatestProduct($userId);
+        $last = $this->productRepository->getLatestProduct($storeId);
 
         $num = $last ? (int) substr($last->barcode, 1) : 0;
 

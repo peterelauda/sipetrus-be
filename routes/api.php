@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\Product\ProductBatchController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Stock\StockMovementController;
@@ -28,6 +29,13 @@ Route::prefix('/products')->middleware('auth:sanctum')->group(function () {
     Route::put('/{id}', [ProductController::class, 'updateProductById'])->middleware('role:admin');
     Route::post('/{id}/adjust-stock', [ProductController::class, 'adjustStock'])->middleware('role:admin');
     Route::delete('/{id}', [ProductController::class, 'deleteProductById'])->middleware('role:admin');
+    Route::post('/{id}/batches', [ProductBatchController::class, 'createBatch'])->middleware('role:admin');
+    Route::get('/{id}/batches', [ProductBatchController::class, 'getProductBatches']);
+});
+
+Route::prefix('/stocks')->middleware('auth:sanctum')->group(function () {
+    Route::get('/expired-stock', [ProductBatchController::class, 'getExpiredStocks']);
+    Route::get('/near-expired', [ProductBatchController::class, 'getNearExpiredStocks']);
 });
 
 Route::prefix('/stock-movements')->middleware('auth:sanctum')->group(function () {

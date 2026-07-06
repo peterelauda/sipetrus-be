@@ -4,13 +4,13 @@ namespace App\Repositories\Contracts\Dashboard;
 
 interface DashboardRepositoryInterface
 {
-    public function getTodaySales(int $userId);
+    public function getTodaySales(int $storeId);
 
-    public function getTodayTransactions(int $userId);
+    public function getTodayTransactions(int $storeId);
 
-    public function getTodayProfit(int $userId);
+    public function getTodayProfit(int $storeId);
 
-    public function getLowStockProducts(int $userId);
+    public function getLowStockProducts(int $storeId);
 
-    public function getTopSellingProducts(int $userId);
+    public function getTopSellingProducts(int $storeId);
 }

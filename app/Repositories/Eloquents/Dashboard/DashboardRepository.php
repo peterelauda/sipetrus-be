@@ -11,26 +11,26 @@ use Illuminate\Support\Facades\DB;
 
 class DashboardRepository implements DashboardRepositoryInterface
 {
-    public function getTodaySales(int $userId)
+    public function getTodaySales(int $storeId)
     {
         return Transaction::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereDate('created_at', Carbon::today())
             ->sum('total');
     }
 
-    public function getTodayTransactions(int $userId)
+    public function getTodayTransactions(int $storeId)
     {
         return Transaction::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereDate('created_at', Carbon::today())
             ->count();
     }
 
-    public function getTodayProfit(int $userId)
+    public function getTodayProfit(int $storeId)
     {
         return TransactionItem::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereDate('created_at', Carbon::today())
             ->selectRaw(
                 'SUM(subtotal - (cost_price * qty)) as total_profit'
@@ -38,15 +38,15 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->value('total_profit');
     }
 
-    public function getLowStockProducts(int $userId)
+    public function getLowStockProducts(int $storeId)
     {
         return Product::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->where('stock', '<=', 5)
             ->count();
     }
 
-    public function getTopSellingProducts(int $userId)
+    public function getTopSellingProducts(int $storeId)
     {
         return TransactionItem::query()
             ->join(
@@ -55,7 +55,7 @@ class DashboardRepository implements DashboardRepositoryInterface
                 '=',
                 'transaction_items.product_id'
             )
-            ->where('transaction_items.user_id', $userId)
+            ->where('transaction_items.store_id', $storeId)
             ->select(
                 'products.id as product_id',
                 'products.name as product_name',

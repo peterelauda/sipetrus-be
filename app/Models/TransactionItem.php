@@ -12,4 +12,11 @@ class TransactionItem extends Model
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
+
+    public function batchAllocations()
+    {
+        return $this->hasMany(
+            TransactionItemBatch::class
+        );
+    }
 }

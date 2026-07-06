@@ -19,22 +19,22 @@ class DashboardService
 
     public function getDashboard()
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         return [
-            'today_sales' => $this->dashboardRepository->getTodaySales($userId),
+            'today_sales' => $this->dashboardRepository->getTodaySales($storeId),
 
             'today_transactions' => $this->dashboardRepository
-                ->getTodayTransactions($userId),
+                ->getTodayTransactions($storeId),
 
             'today_profit' => $this->dashboardRepository
-                ->getTodayProfit($userId) ?? 0,
+                ->getTodayProfit($storeId) ?? 0,
 
             'low_stock_products' => $this->dashboardRepository
-                ->getLowStockProducts($userId),
+                ->getLowStockProducts($storeId),
 
             'top_selling_products' => $this->dashboardRepository
-                ->getTopSellingProducts($userId),
+                ->getTopSellingProducts($storeId),
         ];
     }
 }

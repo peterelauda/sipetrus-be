@@ -10,12 +10,20 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::table('transaction_items', function (Blueprint $table) {
-            $table->foreignId('store_id')
-                ->nullable()
-                ->after('id')
+        Schema::create('product_batches', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('product_id')
                 ->constrained()
                 ->cascadeOnDelete();
+
+            $table->string('batch_number')->unique();
+
+            $table->integer('stock');
+
+            $table->date('expired_date');
+
+            $table->timestamps();
         });
     }
 
@@ -24,9 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::table('transaction_items', function (Blueprint $table) {
-            $table->dropForeign(['store_id']);
-            $table->dropColumn('store_id');
-        });
+        Schema::dropIfExists('product_batches');
     }
 };

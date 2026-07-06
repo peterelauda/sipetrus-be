@@ -6,10 +6,12 @@ use App\DTOs\Transaction\GetTransactionDTO;
 use App\DTOs\Transaction\StoreTransactionDTO;
 use App\Enums\PaymentMethodEnum;
 use App\Enums\PaymentStatusEnum;
+use App\Repositories\Contracts\Product\ProductBatchRepositoryInterface;
 use App\Repositories\Contracts\Product\ProductRepositoryInterface;
 use App\Repositories\Contracts\Product\StockMovementRepositoryInterface;
 use App\Repositories\Contracts\Transaction\TransactionItemRepositoryInterface;
 use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
+use App\Repositories\Contracts\Transaction\TxItemBatchRepositoryInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -19,6 +21,8 @@ class TransactionService
     protected $transactionRepository;
     protected $transactionItemRepository;
     protected $stockMovementRepository;
+    protected $productBatchRepository;
+    protected $transactionItemBatchRepository;
 
     /**
      * Create a new class instance.
@@ -28,11 +32,15 @@ class TransactionService
         TransactionRepositoryInterface $transactionRepository,
         TransactionItemRepositoryInterface $transactionItemRepository,
         StockMovementRepositoryInterface $stockMovementRepository,
+        ProductBatchRepositoryInterface $productBatchRepository,
+        TxItemBatchRepositoryInterface $transactionItemBatchRepository,
     ) {
         $this->productRepository = $productRepository;
         $this->transactionRepository = $transactionRepository;
         $this->transactionItemRepository = $transactionItemRepository;
         $this->stockMovementRepository = $stockMovementRepository;
+        $this->productBatchRepository = $productBatchRepository;
+        $this->transactionItemBatchRepository = $transactionItemBatchRepository;
     }
 
     public function getTransactions(GetTransactionDTO $dto)
@@ -49,12 +57,12 @@ class TransactionService
 
     public function getTransactionById(string $id)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $transaction = $this->transactionRepository
             ->getTransactionDetail($id);
 
-        if (!$transaction || $transaction->user_id !== $userId) {
+        if (!$transaction || $transaction->store_id !== $storeId) {
             throw new \Exception('Invalid transaction ID');
         }
 
@@ -63,7 +71,7 @@ class TransactionService
 
     public function storeTransaction(StoreTransactionDTO $dto)
     {
-        $userId = auth()->id();
+        $storeId = auth()->user()->store_id;
 
         $productIds = collect($dto->items)->pluck('productId')->toArray();
 
@@ -80,8 +88,18 @@ class TransactionService
                 throw new \Exception("Product not found", 404);
             }
 
-            if ($product->stock < $item->qty) {
-                throw new \Exception("Stock not enough for {$product->name}", 422);
+            $batches = $this->productBatchRepository
+                ->getAvailableBatchesByProduct(
+                    $product->id
+                );
+
+            $availableStock = $batches->sum('stock');
+
+            if ($availableStock < $item->qty) {
+                throw new \Exception(
+                    "Stock not enough for {$product->name}",
+                    422
+                );
             }
 
             $subtotal = $product->price * $item->qty;
@@ -107,7 +125,7 @@ class TransactionService
 
         try {
             $transaction = $this->transactionRepository->create([
-                'user_id' => $userId,
+                'store_id' => $storeId,
                 'invoice_number' => $invoiceNumber,
                 'total' => $total,
                 'paid_amount' => $dto->paidAmount,
@@ -117,8 +135,8 @@ class TransactionService
             ]);
 
             foreach ($itemsData as $item) {
-                $this->transactionItemRepository->create([
-                    'user_id' => $userId,
+                $transactionItem = $this->transactionItemRepository->create([
+                    'store_id' => $storeId,
                     'transaction_id' => $transaction->id,
                     'product_id' => $item['product']->id,
                     'qty' => $item['qty'],
@@ -127,10 +145,46 @@ class TransactionService
                     'subtotal' => $item['subtotal'],
                 ]);
 
+                // Reduce stock from product batches
+
+                $remainingQty = $item['qty'];
+
+                $batches = $this->productBatchRepository
+                    ->getAvailableBatchesByProduct(
+                        $item['product']->id
+                    );
+
+                foreach ($batches as $batch) {
+
+                    if ($remainingQty <= 0) {
+                        break;
+                    }
+
+                    $deductQty = min(
+                        $batch->stock,
+                        $remainingQty
+                    );
+
+                    $this->transactionItemBatchRepository->create([
+                        'transaction_item_id' => $transactionItem->id,
+                        'product_batch_id' => $batch->id,
+                        'qty' => $deductQty,
+                    ]);
+
+                    $this->productBatchRepository->update(
+                        $batch->id,
+                        [
+                            'stock' => $batch->stock - $deductQty
+                        ]
+                    );
+
+                    $remainingQty -= $deductQty;
+                }
+
                 $this->productRepository->update($item['product']->id, ['stock' => $item['product']->stock - $item['qty']]);
 
                 $this->stockMovementRepository->create([
-                    'user_id' => $userId,
+                    'store_id' => $storeId,
                     'product_id' => $item['product']->id,
                     'type' => 'out',
                     'qty' => $item['qty'],
@@ -150,7 +204,89 @@ class TransactionService
 
     public function cancelTransactionById(string $id)
     {
-        $this->transactionRepository->cancelTransactionById($id);
+        $storeId = auth()->user()->store_id;
+
+        $transaction = $this->transactionRepository
+            ->getTransactionById(
+                $id,
+                $storeId
+            );
+
+        if (!$transaction) {
+            throw new \Exception(
+                'Transaction not found'
+            );
+        }
+
+        if (
+            $transaction->status ===
+            PaymentStatusEnum::CANCELLED
+        ) {
+            throw new \Exception(
+                'Transaction already cancelled'
+            );
+        }
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($transaction->items as $item) {
+                $product = $this->productRepository
+                    ->getById(
+                        $item->product_id
+                    );
+
+                // Refund product stock
+                $this->productRepository->update(
+                    $item->product_id,
+                    [
+                        'stock' =>
+                            $product->stock +
+                            $item->qty
+                    ]
+                );
+
+                // Refund stock in product batches
+                foreach ($item->batchAllocations as $allocation) {
+                    $batch = $this->productBatchRepository
+                        ->getById(
+                            $allocation->product_batch_id
+                        );
+
+                    $this->productBatchRepository
+                        ->update(
+                            $batch->id,
+                            [
+                                'stock' =>
+                                    $batch->stock +
+                                    $allocation->qty
+                            ]
+                        );
+                }
+
+                $this->stockMovementRepository
+                    ->create([
+                        'store_id' => $storeId,
+                        'product_id' => $item->product_id,
+                        'type' => 'in',
+                        'qty' => $item->qty,
+                        'reference' =>
+                            'CANCEL-' .
+                            $transaction->invoice_number,
+                    ]);
+            }
+
+            $this->transactionRepository
+                ->cancelTransactionById(
+                    $id
+                );
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollBack();
+
+            throw $th;
+        }
     }
 
     public function generateInvoiceNumber()

@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\DB;
 class ReportRepository implements ReportRepositoryInterface
 {
     public function getTotalSales(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     ) {
         return Transaction::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereBetween(
                 'created_at',
                 [$startDate, $endDate]
@@ -25,12 +25,12 @@ class ReportRepository implements ReportRepositoryInterface
     }
 
     public function getTotalTransactions(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     ) {
         return Transaction::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereBetween(
                 'created_at',
                 [$startDate, $endDate]
@@ -39,12 +39,12 @@ class ReportRepository implements ReportRepositoryInterface
     }
 
     public function getTotalProfit(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     ) {
         return TransactionItem::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereBetween(
                 'created_at',
                 [$startDate, $endDate]
@@ -58,12 +58,12 @@ class ReportRepository implements ReportRepositoryInterface
     }
 
     public function getItemsSold(
-        int $userId,
+        int $storeId,
         Carbon $startDate,
         Carbon $endDate
     ) {
         return TransactionItem::query()
-            ->where('user_id', $userId)
+            ->where('store_id', $storeId)
             ->whereBetween(
                 'created_at',
                 [$startDate, $endDate]
