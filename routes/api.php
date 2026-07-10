@@ -7,6 +7,7 @@ use App\Http\Controllers\Product\ProductBatchController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Stock\StockMovementController;
+use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\Transaction\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,6 +57,14 @@ Route::prefix('/expenses')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [ExpenseController::class, 'getExpenseById']);
     Route::put('/{id}', [ExpenseController::class, 'updateExpense'])->middleware('role:admin');
     Route::delete('/{id}', [ExpenseController::class, 'deleteExpense'])->middleware('role:admin');
+});
+
+Route::prefix('/suppliers')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [SupplierController::class, 'createSupplier'])->middleware('role:admin');
+    Route::get('/', [SupplierController::class, 'getSuppliers']);
+    Route::get('/{id}', [SupplierController::class, 'getSupplierById']);
+    Route::put('/{id}', [SupplierController::class, 'updateSupplier'])->middleware('role:admin');
+    Route::delete('/{id}', [SupplierController::class, 'deleteSupplier'])->middleware('role:admin');
 });
 
 Route::prefix('/dashboard')->middleware('auth:sanctum')->group(function () {
