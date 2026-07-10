@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\Purchase\PurchaseItemRepositoryInterface;
+use App\Repositories\Eloquents\Purchase\PurchaseItemRepository;
+use App\Repositories\Contracts\Purchase\PurchaseRepositoryInterface;
+use App\Repositories\Eloquents\Purchase\PurchaseRepository;
 use App\Repositories\Contracts\Supplier\SupplierRepositoryInterface;
 use App\Repositories\Eloquents\Supplier\SupplierRepository;
 use App\Repositories\Contracts\Expense\ExpenseRepositoryInterface;
@@ -33,6 +37,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(PurchaseItemRepositoryInterface::class, PurchaseItemRepository::class);
+        $this->app->bind(PurchaseRepositoryInterface::class, PurchaseRepository::class);
         $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
         $this->app->bind(ExpenseRepositoryInterface::class, ExpenseRepository::class);
         $this->app->bind(TxItemBatchRepositoryInterface::class, TxItemBatchRepository::class);

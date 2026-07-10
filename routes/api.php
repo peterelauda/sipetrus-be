@@ -5,6 +5,7 @@ use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Expense\ExpenseController;
 use App\Http\Controllers\Product\ProductBatchController;
 use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Purchase\PurchaseController;
 use App\Http\Controllers\Report\ReportController;
 use App\Http\Controllers\Stock\StockMovementController;
 use App\Http\Controllers\Supplier\SupplierController;
@@ -57,6 +58,12 @@ Route::prefix('/expenses')->middleware('auth:sanctum')->group(function () {
     Route::get('/{id}', [ExpenseController::class, 'getExpenseById']);
     Route::put('/{id}', [ExpenseController::class, 'updateExpense'])->middleware('role:admin');
     Route::delete('/{id}', [ExpenseController::class, 'deleteExpense'])->middleware('role:admin');
+});
+
+Route::prefix('/purchases')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [PurchaseController::class, 'createPurchase'])->middleware('role:admin');
+    Route::get('/', [PurchaseController::class, 'getPurchases']);
+    Route::get('/{id}', [PurchaseController::class, 'getPurchaseById']);
 });
 
 Route::prefix('/suppliers')->middleware('auth:sanctum')->group(function () {

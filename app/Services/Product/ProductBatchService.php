@@ -117,7 +117,7 @@ class ProductBatchService
      * Example:
      * BATCH-1-20020818-001
      */
-    private function generateBatchNumber(int $productId): string
+    public function generateBatchNumber(int $productId): string
     {
         $lastBatch = $this->productBatchRepository
             ->getLatestBatchByProduct($productId);
