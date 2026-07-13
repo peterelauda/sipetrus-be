@@ -34,7 +34,7 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
         PaymentMethodEnum $paymentMethod
     ) {
         return $this->model
-            ->where('user_id', auth()->id())
+            ->where('store_id', auth()->user()->store_id)
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 $query->whereBetween('created_at', [$startDate, $endDate]);
             })
@@ -57,11 +57,22 @@ class TransactionRepository extends BaseRepository implements TransactionReposit
             ->find($id);
     }
 
+    public function getTransactionById(string $id, int $storeId)
+    {
+        return $this->model
+            ->with([
+                'items.batchAllocations'
+            ])
+            ->where('id', $id)
+            ->where('store_id', $storeId)
+            ->first();
+    }
+
     public function cancelTransactionById(string $id)
     {
         $this->model
             ->where('id', $id)
-            ->where('user_id', auth()->id())
+            ->where('store_id', auth()->user()->store_id)
             ->update(['status' => PaymentStatusEnum::CANCELLED]);
     }
 }

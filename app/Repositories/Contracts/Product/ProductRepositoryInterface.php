@@ -8,9 +8,10 @@ use App\Repositories\Contracts\BaseRepositoryInterface;
 
 interface ProductRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getLatestProduct(string $userId);
-    public function getProductByNameAndCode(string $userId, string $productName, ?string $barcode);
-    public function getProducts(string $userId, GetProductsDTO $dto);
+    public function getLatestProduct(string $storeId);
+    public function getProductByNameAndCode(string $storeId, string $productName, ?string $barcode);
+    public function getProducts(string $storeId, GetProductsDTO $dto);
     public function searchProduct(SearchProductDTO $dto);
     public function getProductsByIds(array $id);
+    public function getLowStockProducts(int $storeId);
 }

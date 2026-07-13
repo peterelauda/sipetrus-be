@@ -2,6 +2,22 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\Purchase\PurchaseItemRepositoryInterface;
+use App\Repositories\Eloquents\Purchase\PurchaseItemRepository;
+use App\Repositories\Contracts\Purchase\PurchaseRepositoryInterface;
+use App\Repositories\Eloquents\Purchase\PurchaseRepository;
+use App\Repositories\Contracts\Supplier\SupplierRepositoryInterface;
+use App\Repositories\Eloquents\Supplier\SupplierRepository;
+use App\Repositories\Contracts\Expense\ExpenseRepositoryInterface;
+use App\Repositories\Eloquents\Expense\ExpenseRepository;
+use App\Repositories\Contracts\Transaction\TxItemBatchRepositoryInterface;
+use App\Repositories\Eloquents\Transaction\TxItemBatchRepository;
+use App\Repositories\Contracts\Product\ProductBatchRepositoryInterface;
+use App\Repositories\Eloquents\Product\ProductBatchRepository;
+use App\Repositories\Contracts\Report\ReportRepositoryInterface;
+use App\Repositories\Eloquents\Report\ReportRepository;
+use App\Repositories\Contracts\Dashboard\DashboardRepositoryInterface;
+use App\Repositories\Eloquents\Dashboard\DashboardRepository;
 use App\Repositories\Contracts\Transaction\TransactionItemRepositoryInterface;
 use App\Repositories\Eloquents\Transaction\TransactionItemRepository;
 use App\Repositories\Contracts\Transaction\TransactionRepositoryInterface;
@@ -21,6 +37,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(PurchaseItemRepositoryInterface::class, PurchaseItemRepository::class);
+        $this->app->bind(PurchaseRepositoryInterface::class, PurchaseRepository::class);
+        $this->app->bind(SupplierRepositoryInterface::class, SupplierRepository::class);
+        $this->app->bind(ExpenseRepositoryInterface::class, ExpenseRepository::class);
+        $this->app->bind(TxItemBatchRepositoryInterface::class, TxItemBatchRepository::class);
+        $this->app->bind(ProductBatchRepositoryInterface::class, ProductBatchRepository::class);
+        $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
+        $this->app->bind(DashboardRepositoryInterface::class, DashboardRepository::class);
         $this->app->bind(TransactionItemRepositoryInterface::class, TransactionItemRepository::class);
         $this->app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
         $this->app->bind(StockMovementRepositoryInterface::class, StockMovementRepository::class);

@@ -11,5 +11,6 @@ interface TransactionRepositoryInterface extends BaseRepositoryInterface
     public function getLatestInvoiceByDate(Carbon $date);
     public function getTransactions(int $page, int $limit, Carbon $startDate, Carbon $endDate, PaymentMethodEnum $paymentMethod);
     public function getTransactionDetail(string $id);
+    public function getTransactionById(string $id, int $storeId);
     public function cancelTransactionById(string $id);
 }
