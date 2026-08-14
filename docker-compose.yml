@@ -28,6 +28,22 @@ services:
     networks:
       - psc-network
 
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - psc-network
+
 networks:
   psc-network:
     external: true
